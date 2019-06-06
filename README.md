@@ -26,10 +26,9 @@ https://www.youtube.com/watch?v=LPT7v69guVY
 
 Content pending
 
-### Installing
+### Running the APP
 
-Content pending
-
+This app requires at least 3 computers to actually work: 1 server and 2 peers. To run the server, you must compile
 
 ## Running the tests
 
