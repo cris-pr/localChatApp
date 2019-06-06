@@ -1,6 +1,6 @@
 # localChatApp
 
-This chat app was created for a University project. The assignment was to create a messaging app with a hybrid p2p/client server architecture. At the end of the project, two prototypes were created, one that could connect two peers directly and one that could connect peers to the server. However the complete app was not fully realized due to time constraints (surprisingly we still got an A for our work). The following were the requirements for the application:
+This chat app was created for a University project. The assignment was to create a messaging app with a hybrid p2p/client server architecture. At the end of the project, two prototypes were created, one that could connect two peers directly and one that could connect peers to the server. However the complete app was not fully realized due to time constraints (We were pretty surprised that we still got an A for our work. I guess the journey was more important than the destination). The following were the requirements for the application:
 
 1.	The application must be implemented in a hybrid P2P architecture. A server must manage the user logins, while the messaging will be done directly between peers.
 2.	The user application must be able to identify all the peers currently in the network and send and receive messages. 
