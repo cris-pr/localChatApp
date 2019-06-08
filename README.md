@@ -75,5 +75,3 @@ Content pending
 Code from the following people was used:
 * Carlos Lopez
 * Cristian Sanchez
-* 
-* 
