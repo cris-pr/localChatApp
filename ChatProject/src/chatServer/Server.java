@@ -27,7 +27,7 @@ public class Server {
         server.start(aPort);
     }
     public Server() {
-       
+    	this.start(aPort);
     }
     public void start(int port) {
         try {

@@ -132,10 +132,8 @@ public class Message implements Serializable{
 	public static void main(String[] args) {
 		Message message = new Message("Hello there","Cristian");
 		try {
-			System.out.println("Initial Message: "+message.getMessageContent());
 			byte[] bytes = message.getBytes();
 			Message outMessage = Message.toMessage(bytes);
-			System.out.println("Final message: "+outMessage.getMessageContent());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

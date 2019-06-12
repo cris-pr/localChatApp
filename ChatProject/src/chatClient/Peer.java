@@ -6,22 +6,31 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
 
 public class Peer implements Serializable{
 	private String username;
 	private String ip;
-	private MessageList messageList;
+	private ArrayList<Message> messageList;
 	private String notificationType;
+	private PeerList peerList;
 	
+	
+
 	public Peer() {
 		username = "Unknown";
-		messageList = new MessageList();
+		messageList = new ArrayList<Message>();
 	}
-	public MessageList getMessageList() {
+	public ArrayList<Message> getMessageList() {
 		return messageList;
 	}
 
-	public void setMessageList(MessageList messageList) {
+	public void setMessageList(ArrayList<Message> messageList) {
 		this.messageList = messageList;
 	}
 
@@ -93,4 +102,19 @@ public class Peer implements Serializable{
         }
         return (Peer) obj;
     }
+	public void addMessage(Message message) {
+		messageList.add(message);
+	}
+	public String getMessageListString() {
+		String messages = new String();
+		for(Message aMessage:messageList) {
+			System.out.println("\nIn for loop the message: \n"+ aMessage.toString());
+			messages = messages.concat(aMessage.toString());
+			messages = messages.concat("\n");
+			//System.out.println(messages);
+		}
+		return messages;
+	}
+	
+	
 }
