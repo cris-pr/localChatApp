@@ -55,14 +55,8 @@ public class chatWindow {
 	private Peer theUser;
 	int clientPort = 50000;
 	int serverPort = 40000;
-	private InetAddress address;
-	private DatagramSocket socket = null;
-	private DatagramSocket serverSocket = null;
-	private DatagramPacket packet;
-	private byte[] sendBuf = new byte[256];
-	private boolean connected = false; 
-	private PeerList peerList;
 	private Peer selectedPeer = null;
+	private Client client = null;
 	DefaultListModel<String> listModel = new DefaultListModel<String>();
 	int modelIndex = 0;
 
@@ -96,15 +90,14 @@ public class chatWindow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize(PeerList peerList, Peer user) {
-		this.peerList = peerList;
-		this.theUser = user;
+		client = new Client(peerList,user);
 
 		frame = new JFrame();
 		frame.setBounds(100, 100, 880, 584);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		connected = true;
-		listen2Server(serverPort);
-		listen(clientPort);
+		client.setConnected(true);
+		client.listenServer();
+		client.listenPeers();
 		if(peerList.getList().size()>0) {
 			for(Peer aPeer:peerList.getList()) {
 				if(!(aPeer.getUsername().compareTo(theUser.getUsername())==0)){
@@ -136,9 +129,9 @@ public class chatWindow {
 		            int index = list.locationToIndex(evt.getPoint());
 		            String peerName = list.getComponent(index).toString();
 		            selectedPeer = peerList.getPeer(peerName);
-		            if (selectedPeer.getMessageList().getCounter() >0) {
-						MessageList peerMessageList = selectedPeer.getMessageList();
-						String peerMessages = peerMessageList.toString();
+		            if (!selectedPeer.getMessageList().isEmpty()) {
+				
+						String peerMessages = selectedPeer.getMessageListString();
 						messageListContent.setText(peerMessages);
 					}
 		            
@@ -170,8 +163,8 @@ public class chatWindow {
 		send.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(selectedPeer != null) {
-					Message sentMessage = new Message(messageBox.getText(),theUser.getUsername());
-					sendToPeer(sentMessage,selectedPeer);
+					Message sentMessage = new Message(messageBox.getText(),client.getTheUser().getUsername());
+					client.sendToPeer(sentMessage,selectedPeer,clientPort);
 					messageListContent.append("Sent:"+sentMessage.toString());
 					messageBox.setText(null);
 				}
@@ -244,118 +237,6 @@ public class chatWindow {
 		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
-	}
-	//Opens a socket and sends a message to a peer
-	public void sendToPeer(Message message,Peer peer) {
-		try {
-			
-			address= InetAddress.getByName(peer.getIp());
-			message.setSender(theUser.getUsername());
-			byte [] bytes = message.getBytes();
-			packet = new DatagramPacket(bytes,bytes.length,address,clientPort);
-			socket.send(packet);
-			receiveAck();
-			peerList.getPeer(peer.getUsername()).getMessageList().addMessage(message);
-			showMessages(peer);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Could not connect to Server", "Login Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-	// The listen function is always running in the background for messages from peers. When a message is received, the message
-	//is added to the sender's messageList
-	public void listen(int port) {
-		Thread listenThread = new Thread("Receiving") {
-			public void run() {
-				try {
-					while(connected) {
-						System.out.println("Running listen().");
-						byte[] data = new byte [1024];
-						socket = new DatagramSocket(50000);
-						DatagramPacket packet = new DatagramPacket(data,data.length);
-						socket.receive(packet);
-						
-						Message received = Message.toMessage(data);
-						for(Peer aPeer:peerList.getList()) {
-							if(aPeer.getUsername().compareTo(received.getSender())==0) {
-								aPeer.getMessageList().addMessage(received);
-							}
-						}
-						//messageListContent.append("Received: "+received.toString());
-						System.out.println("Received message.");
-						socket.close();
-					}
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		};listenThread.start();
-	}
-	public void listen2Server(int serverPort) {
-		Thread listenThread = new Thread("Receiving") {
-			public void run() {
-				try {
-					while(connected) {
-						System.out.println("Running listen().");
-						byte[] data = new byte [1024];
-						serverSocket = new DatagramSocket(serverPort);
-						DatagramPacket packet = new DatagramPacket(data,data.length);
-						serverSocket.receive(packet);
-						Peer newPeer = Peer.byteToPeer(data);
-						System.out.println("Received Notification for: "+newPeer.getUsername()+" of type "+ newPeer.getNotificationType());
-						if(newPeer.getNotificationType().compareTo("Registration")==0 || newPeer.getNotificationType().compareTo("Login")==0) {
-							System.out.println("Entered If");
-
-							if(listModel.get(0).compareTo("No Peers Online")==0) {
-								listModel.remove(0);
-								System.out.println("Removed No PeersOnline");
-
-							}
-							peerList.addPeer(newPeer);
-							listModel.add(modelIndex,newPeer.getUsername());
-							modelIndex++;
-							System.out.println("Added to model");
-
-						}
-						else if(newPeer.getNotificationType().compareTo("Logout")==0) {
-							peerList.removePeer(newPeer);
-							
-							for(int i = 0; i<=modelIndex;i++) {
-								if(listModel.get(i).compareTo(newPeer.getUsername())==0) {
-									listModel.remove(i);
-								}
-							}
-							
-							System.out.println("Removed Peer.");
-							renewPeerList();
-						}
-						serverSocket.close();
-					}
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		};listenThread.start();
-	}
-	//Receives acknowledgement from peer.
-	public void receiveAck() {
-		Timer timer = new Timer();
-		class ResendDatagram extends TimerTask {
-			public void run() {
-				
-			}
-		}
-		TimerTask task = new ResendDatagram();
-		
-	}
-	//When the user double clicks on a peer, this function shows the messages on the messageList area.
-	public void showMessages(Peer aPeer){
-		messageListContent.setText(aPeer.getMessageList().toString());
-	}
-	public void disconnect() {
-		connected = false;
-	}
-	public void renewPeerList() {
-		
 	}
 	
 }
