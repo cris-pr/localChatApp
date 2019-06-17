@@ -21,55 +21,10 @@ This chat app was created for a University project. The assignment was to create
 The project was created using Eclipse. To get started using Eclipse and github you can follow this tutorial: 
 https://www.youtube.com/watch?v=LPT7v69guVY
 
-
-### Prerequisites
-
-Content pending
-
+ 
 ### Running the APP
 
 This app requires at least 3 computers to actually work: 1 server and 2 peers. To run the server, you must compile
-
-## Running the tests
-
-Content pending
-
-
-### Break down into end to end tests
-
-Content pending
-
-
-### And coding style tests
-
-Content pending
-
-## Deployment
-
-Content pending
-
-## Built With
-
-Content pending
-
-
-## Contributing
-
-Content pending
-
-## Versioning
-
-Content pending
-
-
-## Authors
-
-Content pending
-
-
-## License
-
-Content pending
 
 ## Acknowledgments
 Code from the following people was used:
